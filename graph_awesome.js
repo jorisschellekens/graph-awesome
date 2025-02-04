@@ -1,10 +1,12 @@
 function __generate_normal_distribution_SVG(mean, std_dev, width = 80, height = 80, color = "black", line_width = 2, mark = null) {
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", width);
-    svg.setAttribute("height", height);
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", "100%");
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-
+    svg.style.maxWidth = `${maxWidth}px`;
+    svg.style.maxHeight = `${maxHeight}px`;
+    
     const numPoints = 100;
     const minX = mean - 4 * std_dev;
     const maxX = mean + 4 * std_dev;

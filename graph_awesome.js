@@ -1,125 +1,190 @@
-function __generate_normal_distribution_SVG(mean, std_dev, width = 80, height = 80, color = "black", line_width = 2, mark = null) {
+/**
+ * Generates an array of `k` colors evenly distributed over the HSV spectrum.
+ * @param {number} k - The number of colors to generate.
+ * @returns {string[]} An array of `k` HSL color strings.
+ */
+function __generate_HSV_colors(k) {
+    if (k === 3) {
+        return ["#f6511d", "#ffb400", "#00a6ed"];
+    } else if (k === 4) {
+        return ["#219ebc", "#023047", "#ffb703", "#fb8500"];
+    } else if (k == 5) {
+        return ['#55dde0', '#33658a', '#2f4858', '#f6ae2d', '#f26419'];
+    } else {
+        return Array.from({ length: k }, (_, i) => {
+            const hue = (i * 360) / k;
+            return `hsl(${hue}, 100%, 50%)`;
+        });
+    }
+}
+
+/**
+ * Generates an SVG bar chart.
+ * @param {Array} xs - Labels for the bars.
+ * @param {Array<number>} ys - The values representing the heights of the bars.
+ * @param {number} [width=400] - The width of the SVG canvas.
+ * @param {number} [height=200] - The height of the SVG canvas.
+ * @returns {SVGElement} An SVG element containing the bar chart.
+ */
+function __bar_chart(xs, ys, width = 100, height = 100, margin = 10) {
+    const max_value = Math.max(...ys);
+    const bar_width = (width - 2 * margin) / ys.length;
+    const colors = __generate_HSV_colors(ys.length);
+
     const svgNS = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", "100%");
-    svg.setAttribute("height", "100%");
-    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-    svg.style.maxWidth = `${maxWidth}px`;
-    svg.style.maxHeight = `${maxHeight}px`;
-    
-    const numPoints = 100;
-    const minX = mean - 4 * std_dev;
-    const maxX = mean + 4 * std_dev;
+    svg.setAttribute("width", width);
+    svg.setAttribute("height", height);
 
-    function __normal_PDF(x, mean, std_dev) {
-        return (1 / (std_dev * Math.sqrt(2 * Math.PI))) *
-            Math.exp(-0.5 * Math.pow((x - mean) / std_dev, 2));
-    }
-
-    let pathData = "M";
-    let markX = null,
-        markY = null;
-
-    for (let i = 0; i <= numPoints; i++) {
-        let x = minX + (i / numPoints) * (maxX - minX);
-        let y = __normal_PDF(x, mean, std_dev);
-        let svgX = ((x - minX) / (maxX - minX)) * width;
-        let svgY = height - (y * height * 10);
-        pathData += `${svgX},${svgY} `;
-
-        // Find the point to mark
-        if (mark !== null && Math.abs(x - mark) < (maxX - minX) / numPoints) {
-            markX = svgX;
-            markY = svgY;
-        }
-    }
-
-    const path = document.createElementNS(svgNS, "path");
-    path.setAttribute("d", pathData.trim());
-    path.setAttribute("stroke", color);
-    path.setAttribute("fill", "none");
-    path.setAttribute("stroke-width", line_width);
-    svg.appendChild(path);
-
-    // Draw the mark if specified
-    if (markX !== null && markY !== null) {
-        // Line from the circle to the bottom
-        const line = document.createElementNS(svgNS, "line");
-        line.setAttribute("x1", markX);
-        line.setAttribute("y1", markY);
-        line.setAttribute("x2", markX);
-        line.setAttribute("y2", height);
-        line.setAttribute("stroke", "red");
-        line.setAttribute("stroke-width", line_width);
-        svg.appendChild(line);
-
-        // Circle at the mark point
-        const circle = document.createElementNS(svgNS, "circle");
-        circle.setAttribute("cx", markX);
-        circle.setAttribute("cy", markY);
-        circle.setAttribute("r", line_width * 2 + 1);
-        circle.setAttribute("fill", "white"); // Make it hollow
-        circle.setAttribute("stroke", "red"); // Set stroke color
-        circle.setAttribute("stroke-width", line_width);
-        svg.appendChild(circle);
-    }
+    ys.forEach((value, index) => {
+        const bar_height = (value / max_value) * (height - margin);
+        const rect = document.createElementNS(svgNS, "rect");
+        rect.setAttribute("x", index * bar_width + margin);
+        rect.setAttribute("y", height - bar_height);
+        rect.setAttribute("width", bar_width - 2);
+        rect.setAttribute("height", bar_height);
+        rect.setAttribute("fill", colors[index % colors.length]);
+        svg.appendChild(rect);
+    });
 
     return svg;
 }
 
+/**
+ * Generates an SVG donut chart.
+ * @param {Array} xs - Unused parameter (for future extensions).
+ * @param {Array<number>} ys - The values representing the donut slices.
+ * @param {number} [outerRadius=100] - The outer radius of the donut.
+ * @param {number} [innerRadius=50] - The inner radius of the donut (hole size).
+ * @returns {SVGElement} An SVG element containing the donut chart.
+ */
+function __donut_chart(xs, ys, outer_radius = 100, inner_radius = 50, margin = 10) {
+    const total = ys.reduce((sum, value) => sum + value, 0);
+    let cumulative_angle = 0;
+    const center_x = outer_radius + margin;
+    const center_y = outer_radius + margin;
+    const colors = __generate_HSV_colors(ys.length);
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", `${2 * (outer_radius + margin)}`);
+    svg.setAttribute("height", `${2 * (outer_radius + margin)}`);
+
+    ys.forEach((value, index) => {
+        const angle = (value / total) * 2 * Math.PI;
+        const x1 = center_x + outer_radius * Math.cos(cumulative_angle);
+        const y1 = center_y + outer_radius * Math.sin(cumulative_angle);
+        const x1_inner = center_x + inner_radius * Math.cos(cumulative_angle);
+        const y1_inner = center_y + inner_radius * Math.sin(cumulative_angle);
+
+        cumulative_angle += angle;
+
+        const x2 = center_x + outer_radius * Math.cos(cumulative_angle);
+        const y2 = center_y + outer_radius * Math.sin(cumulative_angle);
+        const x2_inner = center_x + inner_radius * Math.cos(cumulative_angle);
+        const y2_inner = center_y + inner_radius * Math.sin(cumulative_angle);
+
+        const large_arc_flag = angle > Math.PI ? 1 : 0;
+        const path = document.createElementNS(svgNS, "path");
+        const d = `M ${x1_inner} ${y1_inner} L ${x1} ${y1} A ${outer_radius} ${outer_radius} 0 ${large_arc_flag} 1 ${x2} ${y2} L ${x2_inner} ${y2_inner} A ${inner_radius} ${inner_radius} 0 ${large_arc_flag} 0 ${x1_inner} ${y1_inner} Z`;
+
+        path.setAttribute("d", d);
+        path.setAttribute("fill", colors[index % colors.length]);
+        svg.appendChild(path);
+    });
+
+    return svg;
+}
+
+/**
+ * Generates an SVG pie chart.
+ * @param {Array} xs - Unused parameter (for future extensions).
+ * @param {Array<number>} ys - The values representing the pie slices.
+ * @returns {SVGElement} An SVG element containing the pie chart.
+ */
+function __pie_chart(xs, ys, radius = 100, margin = 10) {
+    const total = ys.reduce((sum, value) => sum + value, 0);
+    let cumulative_angle = 0;
+    const center_x = radius + margin;
+    const center_y = radius + margin;
+    const colors = __generate_HSV_colors(ys.length);
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", `${2 * (radius + margin)}`);
+    svg.setAttribute("height", `${2 * (radius + margin)}`);
+
+    ys.forEach((value, index) => {
+        const angle = (value / total) * 2 * Math.PI;
+        const x1 = center_x + radius * Math.cos(cumulative_angle);
+        const y1 = center_y + radius * Math.sin(cumulative_angle);
+        cumulative_angle += angle;
+        const x2 = center_x + radius * Math.cos(cumulative_angle);
+        const y2 = center_y + radius * Math.sin(cumulative_angle);
+
+        const large_arc_flag = angle > Math.PI ? 1 : 0;
+        const path = document.createElementNS(svgNS, "path");
+        const d = `M ${center_x} ${center_y} L ${x1} ${y1} A ${radius} ${radius} 0 ${large_arc_flag} 1 ${x2} ${y2} Z`;
+
+        path.setAttribute("d", d);
+        path.setAttribute("fill", colors[index % colors.length]);
+        svg.appendChild(path);
+    });
+
+    return svg;
+}
+
+/**
+ * Generates an SVG donut chart.
+ */
 function __process_dom() {
-    document.querySelectorAll(".ga-normal-distribution").forEach(el => {
+    // Select elements that specify they should be bar, pie, or donut charts
+    document.querySelectorAll(".ga-bar, .ga-pie, .ga-donut").forEach(el => {
         const classList = el.className.split(" ");
-        let mean = 50,
-            std_dev = 15,
-            mark = null;
-        let width = 8,
-            height = 8;
+        let width = 256, height = 256;
+        let xs = [], ys = [];
+        let chartType = "bar"; // Default to bar chart
 
         classList.forEach(cls => {
-            // avg
-            if (cls.startsWith("ga-avg-")) mean = parseFloat(cls.split("-")[2]);
+            // Extract xs values from ga-xs-<num>-<num>-<num>...
+            if (cls.startsWith("ga-xs-")) {
+                xs = cls.split("-").slice(2).map(num => parseFloat(num)).filter(n => !isNaN(n));
+            }
 
-            // std-dev
-            if (cls.startsWith("ga-std-dev-")) std_dev = parseFloat(cls.split("-")[3]);
+            // Extract ys values from ga-ys-<num>-<num>-<num>...
+            if (cls.startsWith("ga-ys-")) {
+                ys = cls.split("-").slice(2).map(num => parseFloat(num)).filter(n => !isNaN(n));
+            }
 
-            // mark
-            if (cls.startsWith("ga-mark-")) mark = parseFloat(cls.split("-")[2]);
+            // Detect chart type
+            if (cls === "ga-donut") chartType = "donut";
+            if (cls === "ga-pie") chartType = "pie";
+            if (cls === "ga-bar") chartType = "bar";
 
-            // size
-            if (cls === "ga-2xs") {
-                width = 1;
-                height = 1;
-            }
-            if (cls === "ga-xs") {
-                width = 2;
-                height = 2;
-            }
-            if (cls === "ga-s") {
-                width = 4;
-                height = 4;
-            }
-            if (cls === "ga-l") {
-                width = 16;
-                height = 16;
-            }
-            if (cls === "ga-xl") {
-                width = 32;
-                height = 32;
-            }
-            if (cls === "ga-2xl") {
-                width = 64;
-                height = 64;
-            }
+            // Size settings
+            if (cls === "ga-2xs") { width = 32; height = 32; }
+            if (cls === "ga-xs") { width = 64; height = 64; }
+            if (cls === "ga-s") { width = 128; height = 128; }
+            if (cls === "ga-l") { width = 512; height = 512; }
+            if (cls === "ga-xl") { width = 1024; height = 1024; }
+            if (cls === "ga-2xl") { width = 2048; height = 2048; }
         });
 
-        // Get the computed color from the original element
-        let color = window.getComputedStyle(el).color;
+        // Generate the appropriate chart SVG
+        let new_element;
+        if (chartType === "donut") {
+            new_element = __donut_chart(xs, ys, width-width/10, (width-width/10)*0.5, width/10);
+        } else if (chartType === "pie") {
+            new_element = __pie_chart(xs, ys, width, width/10);
+        } else {
+            new_element = __bar_chart(xs, ys, width, height, width/10);
+        }
 
         // Replace element with the generated SVG
-        el.replaceWith(__generate_normal_distribution_SVG(mean, std_dev, width * 10, height * 10, color, 2, mark));
+        el.replaceWith(new_element);
     });
 }
+
 
 document.addEventListener("DOMContentLoaded", __process_dom);
 const observer = new MutationObserver(__process_dom);

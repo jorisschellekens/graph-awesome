@@ -173,9 +173,9 @@ function __process_dom() {
         // Generate the appropriate chart SVG
         let new_element;
         if (chartType === "donut") {
-            new_element = __donut_chart(xs, ys, width-width/10, (width-width/10)*0.5, width/10);
+            new_element = __donut_chart(xs, ys, (width-2*(width/10))/2, (width-2*(width/10))/4, width/10);
         } else if (chartType === "pie") {
-            new_element = __pie_chart(xs, ys, width, width/10);
+            new_element = __pie_chart(xs, ys, (width-2*(width/10))/2, width/10);
         } else {
             new_element = __bar_chart(xs, ys, width, height, width/10);
         }

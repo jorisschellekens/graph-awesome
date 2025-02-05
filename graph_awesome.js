@@ -51,6 +51,46 @@ function __bar_chart(xs, ys, width = 100, height = 100, margin = 10) {
 }
 
 /**
+ * Generates an SVG bubble chart.
+ * @param {Array<number>} xs - X-axis positions of bubbles.
+ * @param {Array<number>} ys - Y-axis positions of bubbles.
+ * @param {Array<number>} zs - Sizes of the bubbles.
+ * @param {number} [width=400] - The width of the SVG canvas.
+ * @param {number} [height=200] - The height of the SVG canvas.
+ * @returns {SVGElement} An SVG element containing the bubble chart.
+ */
+function __bubble_chart(xs, ys, zs, width = 400, height = 200, margin = 40) {
+    const max_size = Math.max(...zs);
+    const min_x = Math.min(...xs);
+    const max_x = Math.max(...xs);
+    const min_y = Math.min(...ys);
+    const max_y = Math.max(...ys);
+    const colors = __generate_HSV_colors(xs.length);
+    const svgNS = "http://www.w3.org/2000/svg";
+
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", width);
+    svg.setAttribute("height", height);
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+    xs.forEach((x_value, index) => {
+        const x = margin + ((x_value - min_x) / (max_x - min_x)) * (width - 2 * margin);
+        const y = height - margin - ((ys[index] - min_y) / (max_y - min_y)) * (height - 2 * margin);
+        const r = (zs[index] / max_size) * 5 + 1;
+
+        const circle = document.createElementNS(svgNS, "circle");
+        circle.setAttribute("cx", x);
+        circle.setAttribute("cy", y);
+        circle.setAttribute("r", r);
+        circle.setAttribute("fill", colors[index % colors.length]);
+        circle.setAttribute("opacity", "0.6");
+        svg.appendChild(circle);
+    });
+
+    return svg;
+}
+
+/**
  * Generates an SVG donut chart.
  * @param {Array} xs - Unused parameter (for future extensions).
  * @param {Array<number>} ys - The values representing the donut slices.
@@ -58,7 +98,7 @@ function __bar_chart(xs, ys, width = 100, height = 100, margin = 10) {
  * @param {number} [innerRadius=50] - The inner radius of the donut (hole size).
  * @returns {SVGElement} An SVG element containing the donut chart.
  */
-function __donut_chart(xs, ys, outer_radius = 100, inner_radius = 50, margin = 10) {
+function __donut_chart(xs, ys, outer_radius = 40, inner_radius = 20, margin = 10) {
     const total = ys.reduce((sum, value) => sum + value, 0);
     let cumulative_angle = 0;
     const center_x = outer_radius + margin;
@@ -95,6 +135,57 @@ function __donut_chart(xs, ys, outer_radius = 100, inner_radius = 50, margin = 1
 
     return svg;
 }
+
+/**
+ * Generates an SVG line chart.
+ * @param {Array} xs - Labels for the x-axis.
+ * @param {Array<number>} ys - The values representing the y-axis points.
+ * @param {number} [width=400] - The width of the SVG canvas.
+ * @param {number} [height=200] - The height of the SVG canvas.
+ * @returns {SVGElement} An SVG element containing the line chart.
+ */
+function __line_chart(xs, ys, width = 100, height = 100, margin = 10) {
+    const max_value = Math.max(...ys);
+    const min_value = Math.min(...ys);
+    const colors = __generate_HSV_colors(3);
+    const svgNS = "http://www.w3.org/2000/svg";
+
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", width);
+    svg.setAttribute("height", height);
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+    const x_step = (width - 2 * margin) / (xs.length - 1);
+    const y_scale = (height - 2 * margin) / (max_value - min_value);
+
+    let path_d = "M";
+    ys.forEach((value, index) => {
+        const x = margin + index * x_step;
+        const y = height - margin - (value - min_value) * y_scale;
+        path_d += `${x},${y} `;
+    });
+
+    const path = document.createElementNS(svgNS, "path");
+    path.setAttribute("d", path_d.trim());
+    path.setAttribute("stroke", colors[0]);
+    path.setAttribute("stroke-width", "2");
+    path.setAttribute("fill", "none");
+    svg.appendChild(path);
+
+    ys.forEach((value, index) => {
+        const x = margin + index * x_step;
+        const y = height - margin - (value - min_value) * y_scale;
+        const circle = document.createElementNS(svgNS, "circle");
+        circle.setAttribute("cx", x);
+        circle.setAttribute("cy", y);
+        circle.setAttribute("r", 4);
+        circle.setAttribute("fill", colors[1]);
+        svg.appendChild(circle);
+    });
+
+    return svg;
+}
+
 
 /**
  * Generates an SVG pie chart.
@@ -135,14 +226,33 @@ function __pie_chart(xs, ys, radius = 100, margin = 10) {
 }
 
 /**
- * Generates an SVG donut chart.
+ * Processes the DOM to generate and replace elements with corresponding SVG charts.
+ * It identifies elements with specific class names (`ga-bar`, `ga-bubble`, `ga-donut`,
+ * `ga-line`, `ga-pie`), extracts numerical data from class names, and generates
+ * the appropriate chart.
+ *
+ * Supported chart types:
+ * - Bar chart (`ga-bar`)
+ * - Bubble chart (`ga-bubble`)
+ * - Donut chart (`ga-donut`)
+ * - Line chart (`ga-line`)
+ * - Pie chart (`ga-pie`)
+ *
+ * Class-based parameters:
+ * - `ga-xs-*` for x-axis values
+ * - `ga-ys-*` for y-axis values
+ * - `ga-zs-*` for bubble sizes (only for `ga-bubble`)
+ * - `ga-<size>` for adjusting chart dimensions (`ga-xs`, `ga-l`, etc.)
+ *
+ * This function runs on DOMContentLoaded and listens for DOM changes to dynamically
+ * update charts when elements are added or modified.
  */
 function __process_dom() {
     // Select elements that specify they should be bar, pie, or donut charts
-    document.querySelectorAll(".ga-bar, .ga-pie, .ga-donut").forEach(el => {
+    document.querySelectorAll(".ga-bar, .ga-bubble, .ga-donut, .ga-line, .ga-pie").forEach(el => {
         const classList = el.className.split(" ");
         let width = 256, height = 256;
-        let xs = [], ys = [];
+        let xs = [], ys = [], zs = [];
         let chartType = "bar"; // Default to bar chart
 
         classList.forEach(cls => {
@@ -156,10 +266,17 @@ function __process_dom() {
                 ys = cls.split("-").slice(2).map(num => parseFloat(num)).filter(n => !isNaN(n));
             }
 
+            // Extract ys values from ga-zs-<num>-<num>-<num>...
+            if (cls.startsWith("ga-zs-")) {
+                zs = cls.split("-").slice(2).map(num => parseFloat(num)).filter(n => !isNaN(n));
+            }
+
             // Detect chart type
-            if (cls === "ga-donut") chartType = "donut";
-            if (cls === "ga-pie") chartType = "pie";
             if (cls === "ga-bar") chartType = "bar";
+            if (cls === "ga-bubble") chartType = "bubble";
+            if (cls === "ga-donut") chartType = "donut";
+            if (cls === "ga-line") chartType = "line";
+            if (cls === "ga-pie") chartType = "pie";
 
             // Size settings
             if (cls === "ga-2xs") { width = 32; height = 32; }
@@ -172,8 +289,12 @@ function __process_dom() {
 
         // Generate the appropriate chart SVG
         let new_element;
-        if (chartType === "donut") {
+        if (chartType === "bubble") {
+            new_element = __bubble_chart(xs, ys, zs, width, height, width/10);
+        } else if (chartType === "donut") {
             new_element = __donut_chart(xs, ys, (width-2*(width/10))/2, (width-2*(width/10))/4, width/10);
+        } else if (chartType === "line") {
+            new_element = __line_chart(xs, ys, width, height, width/10);
         } else if (chartType === "pie") {
             new_element = __pie_chart(xs, ys, (width-2*(width/10))/2, width/10);
         } else {

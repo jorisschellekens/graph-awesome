@@ -79,13 +79,3 @@ Each chart type supports specific parameters that are set using class names.
 The script automatically runs on `DOMContentLoaded` and listens for changes to update dynamically.
 
 ---
-
-## Notes
-
-- Ensure numerical values in class names are separated by `-`.
-- `ga-xs-*` is optional for bar, donut, and pie charts.
-- Bubble charts require all three parameters: `ga-xs-*`, `ga-ys-*`, and `ga-zs-*`.
-- Charts resize based on the `ga-<size>` class.
-
-For further customization, modify the JavaScript functions accordingly.
-

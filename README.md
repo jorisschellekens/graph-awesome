@@ -2,6 +2,22 @@
 
 This library provides functions to generate various types of SVG charts dynamically based on data provided through HTML class names.
 
+## Hello World
+
+```html
+<html>
+  <head>
+  </head>
+  <body>
+    <!-- bar chart -->
+    <div class="ga-bar ga-xs-1-2-3-4 ga-ys-10-20-15-25 ga-s"></div>
+
+    <!-- load graph-awesome.js -->
+    <script src="https://cdn.jsdelivr.net/gh/jorisschellekens/graph-awesome@main/graph_awesome.js"></script>
+  </body>
+</html>
+```
+
 ## Supported Chart Types
 
 The library supports the following chart types:
@@ -79,3 +95,4 @@ Each chart type supports specific parameters that are set using class names.
 The script automatically runs on `DOMContentLoaded` and listens for changes to update dynamically.
 
 ---
+

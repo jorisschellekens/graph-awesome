@@ -22,22 +22,22 @@ Each chart type supports specific parameters that are set using class names.
 
 ### General Parameters
 
-| Parameter     | Description                                  | Accepted Values                     |
-|--------------|----------------------------------|---------------------------------|
-| `ga-xs-*`    | X-axis values (if applicable)     | Numbers separated by `-` (e.g., `ga-xs-1-2-3-4`) |
-| `ga-ys-*`    | Y-axis values                     | Numbers separated by `-`       |
-| `ga-zs-*`    | Bubble sizes (for `ga-bubble`)   | Numbers separated by `-`       |
-| `ga-<size>`  | Chart dimensions                 | `ga-xs`, `ga-s`, `ga-l`, `ga-xl`, etc. |
+| Parameter     | Description                      | Accepted Values                                  |
+|---------------|----------------------------------|--------------------------------------------------|
+| `ga-xs-*`     | X-axis values (if applicable)    | Numbers separated by `-` (e.g., `ga-xs-1-2-3-4`) |
+| `ga-ys-*`     | Y-axis values                    | Numbers separated by `-`                         |
+| `ga-zs-*`     | Bubble sizes (for `ga-bubble`)   | Numbers separated by `-`                         |
+| `ga-<size>`   | Chart dimensions                 | `ga-xs`, `ga-s`, `ga-l`, `ga-xl`, etc.           |
 
 ### Chart-Specific Parameters
 
-| Chart Type   | Required Parameters        | Optional Parameters |
-|-------------|--------------------------|--------------------|
-| Bar Chart   | `ga-ys-*`                 | `ga-xs-*`, `ga-<size>` |
-| Bubble Chart | `ga-xs-*`, `ga-ys-*`, `ga-zs-*` | `ga-<size>` |
-| Donut Chart  | `ga-ys-*`                 | `ga-xs-*`, `ga-<size>` |
-| Line Chart   | `ga-xs-*`, `ga-ys-*`      | `ga-<size>` |
-| Pie Chart    | `ga-ys-*`                 | `ga-xs-*`, `ga-<size>` |
+| Chart Type   | Required Parameters             | Optional Parameters    |
+|--------------|---------------------------------|------------------------|
+| Bar Chart    | `ga-xs-*`, `ga-ys-*`            | `ga-<size>`            |
+| Bubble Chart | `ga-xs-*`, `ga-ys-*`, `ga-zs-*` | `ga-<size>`            |
+| Donut Chart  | `ga-ys-*`, `ga-ys-*`            | `ga-<size>`            |
+| Line Chart   | `ga-xs-*`, `ga-ys-*`            | `ga-<size>`            |
+| Pie Chart    | `ga-ys-*`, `ga-ys-*`            | `ga-<size>`            |
 
 ---
 

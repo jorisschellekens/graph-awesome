@@ -1,4 +1,4 @@
-# Graph Awesome
+# ![graph awesome logo](https://github.com/jorisschellekens/graph-awesome/raw/master/img/graph_awesome_logo.webp) Graph Awesome
 
 This library provides functions to generate various types of SVG charts dynamically based on data provided through HTML class names.
 

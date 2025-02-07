@@ -53,8 +53,8 @@ function __generate_legend(labels, colors, item_size = 20) {
     const cell_width = item_size + single_space_width + longest_label_width + single_space_width; // Enough space for the label text
     const cell_height = item_size + single_space_width;
 
-    const width = cols * cell_width;
-    const height = rows * cell_height;
+    const width = Math.ceil(cols * cell_width);
+    const height = Math.ceil(rows * cell_height);
 
     const svgNS = "http://www.w3.org/2000/svg";
     const legend = document.createElementNS(svgNS, "svg");

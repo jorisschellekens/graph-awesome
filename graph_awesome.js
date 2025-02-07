@@ -1,3 +1,14 @@
+/**
+ * Calculates the width of a given text string when rendered with a specified font size.
+ * 
+ * This function creates an SVG text element to measure the width of the text accurately.
+ * It temporarily appends the element to the document, retrieves its bounding box width,
+ * and then removes it to avoid cluttering the DOM.
+ * 
+ * @param {string} text - The text whose width is to be measured.
+ * @param {number|string} font_size - The font size to be used for measuring the text.
+ * @returns {number} - The calculated width of the text in pixels.
+ */
 function __get_text_width(text, font_size) {
     // Create an SVG element in memory
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");

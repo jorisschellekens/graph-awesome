@@ -151,6 +151,74 @@ function __bar_chart(xs, ys, width = 100, height = 100, margin = 10) {
     return svg;
 }
 
+    /**
+ * Generates an SVG box plot.
+ * @param {Array<number>} data - The numerical dataset.
+ * @param {number} width - The width of the SVG canvas.
+ * @param {number} height - The height of the SVG canvas.
+ * @returns {SVGElement} An SVG element containing the box plot.
+ */
+function __box_plot(data, width, height) {
+    if (data.length === 0) return null;
+    
+    data.sort((a, b) => a - b);
+    
+    const q1 = data[Math.floor(data.length * 0.25)];
+    const median = data[Math.floor(data.length * 0.5)];
+    const q3 = data[Math.floor(data.length * 0.75)];
+    const min = data[0];
+    const max = data[data.length - 1];
+    
+    const margin = 20;
+    
+    const scale = d => margin + ((d - min) / (max - min)) * (width - 2 * margin);
+    
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", width);
+    svg.setAttribute("height", height);
+    
+    // Box (IQR)
+    const box = document.createElementNS(svgNS, "rect");
+    box.setAttribute("x", scale(q1));
+    box.setAttribute("y", height / 3);
+    box.setAttribute("width", scale(q3) - scale(q1));
+    box.setAttribute("height", height / 3);
+    //box.setAttribute("fill", "#69b3a2");
+    box.setAttribute("stroke", "black");
+    
+    // Median Line
+    const medianLine = document.createElementNS(svgNS, "line");
+    medianLine.setAttribute("x1", scale(median));
+    medianLine.setAttribute("x2", scale(median));
+    medianLine.setAttribute("y1", height / 3);
+    medianLine.setAttribute("y2", 2 * height / 3);
+    medianLine.setAttribute("stroke", "black");
+    
+    // Whiskers
+    const whiskerMin = document.createElementNS(svgNS, "line");
+    whiskerMin.setAttribute("x1", scale(min));
+    whiskerMin.setAttribute("x2", scale(q1));
+    whiskerMin.setAttribute("y1", height / 1.6);
+    whiskerMin.setAttribute("y2", height / 1.6);
+    whiskerMin.setAttribute("stroke", "black");
+    
+    const whiskerMax = document.createElementNS(svgNS, "line");
+    whiskerMax.setAttribute("x1", scale(q3));
+    whiskerMax.setAttribute("x2", scale(max));
+    whiskerMax.setAttribute("y1", height / 1.6);
+    whiskerMax.setAttribute("y2", height / 1.6);
+    whiskerMax.setAttribute("stroke", "black");
+    
+    // Add elements to SVG
+    svg.appendChild(box);
+    svg.appendChild(medianLine);
+    svg.appendChild(whiskerMin);
+    svg.appendChild(whiskerMax);
+    
+    return svg;
+}
+
 /**
  * Generates an SVG bubble chart.
  * @param {Array<number>} xs - X-axis positions of bubbles.

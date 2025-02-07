@@ -45,16 +45,17 @@ Each chart type supports specific parameters that are set using class names.
 | `ga-ys-*`     | Y-axis values                    | Numbers separated by `-`                         |
 | `ga-zs-*`     | Bubble sizes (for `ga-bubble`)   | Numbers separated by `-`                         |
 | `ga-<size>`   | Chart dimensions                 | `ga-xs`, `ga-s`, `ga-l`, `ga-xl`, etc.           |
+| `ga-legend`   | If present, a legend is added    | N.A.                                             |
 
 ### Chart-Specific Parameters
 
-| Chart Type   | Required Parameters             | Optional Parameters    |
-|--------------|---------------------------------|------------------------|
-| Bar Chart    | `ga-xs-*`, `ga-ys-*`            | `ga-<size>`            |
-| Bubble Chart | `ga-xs-*`, `ga-ys-*`, `ga-zs-*` | `ga-<size>`            |
-| Donut Chart  | `ga-ys-*`, `ga-ys-*`            | `ga-<size>`            |
-| Line Chart   | `ga-xs-*`, `ga-ys-*`            | `ga-<size>`            |
-| Pie Chart    | `ga-ys-*`, `ga-ys-*`            | `ga-<size>`            |
+| Chart Type   | Required Parameters             | Optional Parameters      |
+|--------------|---------------------------------|--------------------------|
+| Bar Chart    | `ga-xs-*`, `ga-ys-*`            | `ga-<size>`, `ga-legend` |
+| Bubble Chart | `ga-xs-*`, `ga-ys-*`, `ga-zs-*` | `ga-<size>`              |
+| Donut Chart  | `ga-xs-*`, `ga-ys-*`            | `ga-<size>`, `ga-legend` |
+| Line Chart   | `ga-xs-*`, `ga-ys-*`            | `ga-<size>`              |
+| Pie Chart    | `ga-xs-*`, `ga-ys-*`            | `ga-<size>`, `ga-legend` |
 
 ---
 

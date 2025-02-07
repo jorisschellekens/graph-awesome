@@ -1,4 +1,4 @@
-# Chart Library Documentation
+# Graph Awesome
 
 This library provides functions to generate various types of SVG charts dynamically based on data provided through HTML class names.
 

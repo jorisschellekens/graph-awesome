@@ -63,7 +63,7 @@ Each chart type supports specific parameters that are set using class names.
 
 ### Bar Chart
 ```html
-<div class="ga-bar ga-xs-1-2-3-4 ga-ys-10-20-15-25 ga-s"></div>
+<div class="ga-bar ga-xs-apple-banana-cherry-durian ga-ys-10-20-15-25 ga-s"></div>
 ```
 
 ### Bubble Chart
@@ -73,7 +73,7 @@ Each chart type supports specific parameters that are set using class names.
 
 ### Donut Chart
 ```html
-<div class="ga-donut ga-ys-30-50-20 ga-xs-Red-Green-Blue ga-m"></div>
+<div class="ga-donut ga-xs-apple-banana-cherry-durian ga-ys-30-50-20 ga-m"></div>
 ```
 
 ### Line Chart
@@ -83,7 +83,7 @@ Each chart type supports specific parameters that are set using class names.
 
 ### Pie Chart
 ```html
-<div class="ga-pie ga-ys-40-30-20-10 ga-xs-Apple-Banana-Cherry-Dates ga-l"></div>
+<div class="ga-pie ga-xs-apple-banana-cherry-durian ga-ys-40-30-20-10 ga-l"></div>
 ```
 
 ---

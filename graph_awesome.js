@@ -151,14 +151,14 @@ function __bar_chart(xs, ys, width = 100, height = 100, margin = 10) {
     return svg;
 }
 
-    /**
+/**
  * Generates an SVG box plot.
  * @param {Array<number>} data - The numerical dataset.
  * @param {number} width - The width of the SVG canvas.
  * @param {number} height - The height of the SVG canvas.
  * @returns {SVGElement} An SVG element containing the box plot.
  */
-function __box_plot(data, width, height) {
+function __box_plot(data, width, height, margin) {
     if (data.length === 0) return null;
     
     data.sort((a, b) => a - b);
@@ -169,8 +169,6 @@ function __box_plot(data, width, height) {
     const min = data[0];
     const max = data[data.length - 1];
     
-    const margin = 20;
-    
     const scale = d => margin + ((d - min) / (max - min)) * (width - 2 * margin);
     
     const svgNS = "http://www.w3.org/2000/svg";
@@ -180,34 +178,35 @@ function __box_plot(data, width, height) {
     
     // Box (IQR)
     const box = document.createElementNS(svgNS, "rect");
+    const h = (scale(q3) - scale(q1)) * 0.618;
     box.setAttribute("x", scale(q1));
-    box.setAttribute("y", height / 3);
+    box.setAttribute("y", (height - h)/2);
     box.setAttribute("width", scale(q3) - scale(q1));
-    box.setAttribute("height", height / 3);
-    //box.setAttribute("fill", "#69b3a2");
+    box.setAttribute("height", h);
+    box.setAttribute("fill", "#ffb703");
     box.setAttribute("stroke", "black");
     
     // Median Line
     const medianLine = document.createElementNS(svgNS, "line");
     medianLine.setAttribute("x1", scale(median));
     medianLine.setAttribute("x2", scale(median));
-    medianLine.setAttribute("y1", height / 3);
-    medianLine.setAttribute("y2", 2 * height / 3);
+    medianLine.setAttribute("y1", (height - h)/2+h);
+    medianLine.setAttribute("y2", (height - h)/2);
     medianLine.setAttribute("stroke", "black");
     
     // Whiskers
     const whiskerMin = document.createElementNS(svgNS, "line");
     whiskerMin.setAttribute("x1", scale(min));
     whiskerMin.setAttribute("x2", scale(q1));
-    whiskerMin.setAttribute("y1", height / 1.6);
-    whiskerMin.setAttribute("y2", height / 1.6);
+    whiskerMin.setAttribute("y1", height / 2);
+    whiskerMin.setAttribute("y2", height / 2);
     whiskerMin.setAttribute("stroke", "black");
     
     const whiskerMax = document.createElementNS(svgNS, "line");
     whiskerMax.setAttribute("x1", scale(q3));
     whiskerMax.setAttribute("x2", scale(max));
-    whiskerMax.setAttribute("y1", height / 1.6);
-    whiskerMax.setAttribute("y2", height / 1.6);
+    whiskerMax.setAttribute("y1", height / 2);
+    whiskerMax.setAttribute("y2", height / 2);
     whiskerMax.setAttribute("stroke", "black");
     
     // Add elements to SVG
@@ -216,6 +215,7 @@ function __box_plot(data, width, height) {
     svg.appendChild(whiskerMin);
     svg.appendChild(whiskerMax);
     
+    // Return
     return svg;
 }
 
@@ -418,7 +418,7 @@ function __pie_chart(xs, ys, radius = 100, margin = 10) {
  */
 function __process_dom() {
     // Select elements that specify they should be bar, pie, or donut charts
-    document.querySelectorAll(".ga-bar, .ga-bubble, .ga-donut, .ga-line, .ga-pie").forEach(el => {
+    document.querySelectorAll(".ga-bar, .ga-box, .ga-bubble, .ga-donut, .ga-line, .ga-pie").forEach(el => {
         const classList = el.className.split(" ");
         let width = 256,
             height = 256;
@@ -451,6 +451,7 @@ function __process_dom() {
 
             // Detect chart type
             if (cls === "ga-bar") chartType = "bar";
+            if (cls === "ga-box") chartType = "box";            
             if (cls === "ga-bubble") chartType = "bubble";
             if (cls === "ga-donut") chartType = "donut";
             if (cls === "ga-line") chartType = "line";
@@ -486,6 +487,9 @@ function __process_dom() {
         // Generate the appropriate chart SVG
         let new_element;
         if (chartType === "bubble") {
+            new_element = __box_chart(xs, width, height, width / 10);
+            has_legend = false;
+        } else if (chartType === "bubble") {
             ys = ys.map(num => parseFloat(num)).filter(n => !isNaN(n));
             new_element = __bubble_chart(xs, ys, zs, width, height, width / 10);
             has_legend = false;

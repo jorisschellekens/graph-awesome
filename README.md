@@ -5,12 +5,13 @@ This library provides functions to generate various types of SVG charts dynamica
 ## Hello World
 
 ```html
+<!DOCTYPE html>
 <html>
   <head>
   </head>
   <body>
     <!-- bar chart -->
-    <div class="ga-bar ga-xs-1-2-3-4 ga-ys-10-20-15-25 ga-s"></div>
+    <div class="ga-bar ga-xs-appel-peer-mandarijn-kiwi ga-ys-10-20-15-25 ga-s ga-legend"></div>
 
     <!-- load graph-awesome.js -->
     <script src="https://cdn.jsdelivr.net/gh/jorisschellekens/graph-awesome@main/graph_awesome.js"></script>

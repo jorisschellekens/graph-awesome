@@ -1,4 +1,67 @@
 /**
+ * Generates an SVG legend for a chart without specifying width and height.
+ * It dynamically adjusts to fit all labels while maintaining a balanced layout.
+ * @param {Array<string>} labels - Labels for the legend items.
+ * @param {Array<string>} colors - Corresponding colors for each label.
+ * @param {number} [itemSize=20] - The size of each legend item (both square and text height).
+ * @param {number} [padding=10] - The padding between legend items.
+ * @returns {SVGElement} An SVG element containing the legend.
+ */
+function __generate_legend(labels, colors, item_size = 20, padding = 10) {
+    const golden_ratio = 1.618;
+    const item_count = labels.length;
+
+    // Calculate optimal columns and rows using the golden ratio
+    const cols = Math.ceil(Math.sqrt(item_count * golden_ratio));
+    const rows = Math.ceil(item_count / cols);
+
+    const longest_label_length = Math.max(...labels.map(s => s.length));
+    const cell_width = item_size + item_size * longest_label_length * 0.500 + item_size * 0.250; // Enough space for the label text
+    const cell_height = item_size + padding;
+
+    const width = cols * cell_width;
+    const height = rows * cell_height;
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const legend = document.createElementNS(svgNS, "svg");
+    legend.setAttribute("width", width);
+    legend.setAttribute("height", height);
+
+    labels.forEach((label, index) => {
+        const col = index % cols;
+        const row = Math.floor(index / cols);
+        const x = col * cell_width + padding;
+        const y = row * cell_height + padding;
+
+        const group = document.createElementNS(svgNS, "g");
+
+        const rect = document.createElementNS(svgNS, "rect");
+        rect.setAttribute("x", x);
+        rect.setAttribute("y", y);
+        rect.setAttribute("rx", item_size / 20);
+        rect.setAttribute("ry", item_size / 20);
+        rect.setAttribute("width", item_size);
+        rect.setAttribute("height", item_size);
+        rect.setAttribute("fill", colors[index % colors.length]);
+
+        const text = document.createElementNS(svgNS, "text");
+        text.setAttribute("x", x + item_size + item_size * 0.250); // add 1 space character's worth of padding
+        text.setAttribute("y", y + item_size); // text is placed on th bottom
+        text.setAttribute("font-size", item_size);
+        text.setAttribute("fill", "#000");
+        text.textContent = label;
+
+        group.appendChild(rect);
+        group.appendChild(text);
+        legend.appendChild(group);
+    });
+
+    return legend;
+}
+
+
+
+/**
  * Generates an array of `k` colors evenly distributed over the HSV spectrum.
  * @param {number} k - The number of colors to generate.
  * @returns {string[]} An array of `k` HSL color strings.
@@ -11,7 +74,9 @@ function __generate_HSV_colors(k) {
     } else if (k == 5) {
         return ['#55dde0', '#33658a', '#2f4858', '#f6ae2d', '#f26419'];
     } else {
-        return Array.from({ length: k }, (_, i) => {
+        return Array.from({
+            length: k
+        }, (_, i) => {
             const hue = (i * 360) / k;
             return `hsl(${hue}, 100%, 50%)`;
         });
@@ -41,6 +106,8 @@ function __bar_chart(xs, ys, width = 100, height = 100, margin = 10) {
         const rect = document.createElementNS(svgNS, "rect");
         rect.setAttribute("x", index * bar_width + margin);
         rect.setAttribute("y", height - bar_height);
+        rect.setAttribute("rx", bar_width / 20);
+        rect.setAttribute("ry", bar_width / 20);
         rect.setAttribute("width", bar_width - 2);
         rect.setAttribute("height", bar_height);
         rect.setAttribute("fill", colors[index % colors.length]);
@@ -251,14 +318,18 @@ function __process_dom() {
     // Select elements that specify they should be bar, pie, or donut charts
     document.querySelectorAll(".ga-bar, .ga-bubble, .ga-donut, .ga-line, .ga-pie").forEach(el => {
         const classList = el.className.split(" ");
-        let width = 256, height = 256;
-        let xs = [], ys = [], zs = [];
+        let width = 256,
+            height = 256;
+        let xs = [],
+            ys = [],
+            zs = [];
         let chartType = "bar"; // Default to bar chart
+        let has_legend = false;
 
         classList.forEach(cls => {
             // Extract xs values from ga-xs-<num>-<num>-<num>...
             if (cls.startsWith("ga-xs-")) {
-                xs = cls.split("-").slice(2).map(num => parseFloat(num)).filter(n => !isNaN(n));
+                xs = cls.split("-").slice(2);
             }
 
             // Extract ys values from ga-ys-<num>-<num>-<num>...
@@ -271,6 +342,11 @@ function __process_dom() {
                 zs = cls.split("-").slice(2).map(num => parseFloat(num)).filter(n => !isNaN(n));
             }
 
+            // Extract xs values from ga-xs-<num>-<num>-<num>...
+            if (cls.startsWith("ga-legend")) {
+                has_legend = true;
+            }
+
             // Detect chart type
             if (cls === "ga-bar") chartType = "bar";
             if (cls === "ga-bubble") chartType = "bubble";
@@ -279,30 +355,54 @@ function __process_dom() {
             if (cls === "ga-pie") chartType = "pie";
 
             // Size settings
-            if (cls === "ga-2xs") { width = 32; height = 32; }
-            if (cls === "ga-xs") { width = 64; height = 64; }
-            if (cls === "ga-s") { width = 128; height = 128; }
-            if (cls === "ga-l") { width = 512; height = 512; }
-            if (cls === "ga-xl") { width = 1024; height = 1024; }
-            if (cls === "ga-2xl") { width = 2048; height = 2048; }
+            if (cls === "ga-2xs") {
+                width = 32;
+                height = 32;
+            }
+            if (cls === "ga-xs") {
+                width = 64;
+                height = 64;
+            }
+            if (cls === "ga-s") {
+                width = 128;
+                height = 128;
+            }
+            if (cls === "ga-l") {
+                width = 512;
+                height = 512;
+            }
+            if (cls === "ga-xl") {
+                width = 1024;
+                height = 1024;
+            }
+            if (cls === "ga-2xl") {
+                width = 2048;
+                height = 2048;
+            }
         });
 
         // Generate the appropriate chart SVG
         let new_element;
         if (chartType === "bubble") {
-            new_element = __bubble_chart(xs, ys, zs, width, height, width/10);
+            new_element = __bubble_chart(xs, ys, zs, width, height, width / 10);
         } else if (chartType === "donut") {
-            new_element = __donut_chart(xs, ys, (width-2*(width/10))/2, (width-2*(width/10))/4, width/10);
+            new_element = __donut_chart(xs, ys, (width - 2 * (width / 10)) / 2, (width - 2 * (width / 10)) / 4, width / 10);
         } else if (chartType === "line") {
-            new_element = __line_chart(xs, ys, width, height, width/10);
+            new_element = __line_chart(xs, ys, width, height, width / 10);
         } else if (chartType === "pie") {
-            new_element = __pie_chart(xs, ys, (width-2*(width/10))/2, width/10);
+            new_element = __pie_chart(xs, ys, (width - 2 * (width / 10)) / 2, width / 10);
         } else {
-            new_element = __bar_chart(xs, ys, width, height, width/10);
+            new_element = __bar_chart(xs, ys, width, height, width / 10);
         }
 
         // Replace element with the generated SVG
         el.replaceWith(new_element);
+
+        // legend
+        if (has_legend) {
+            new_element.parentNode.insertBefore(__generate_legend(xs, __generate_HSV_colors(xs.length), width / 10, width / 20), new_element.nextSibling);
+        }
+
     });
 }
 

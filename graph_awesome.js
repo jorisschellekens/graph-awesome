@@ -1,3 +1,25 @@
+function __get_text_width(text, font_size) {
+    // Create an SVG element in memory
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.style.visibility = "hidden";
+    document.body.appendChild(svg);
+
+    // Create a text element inside the SVG
+    const textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    textElement.setAttribute("font-size", font_size);
+    textElement.textContent = text;
+    svg.appendChild(textElement);
+
+    // Use getBBox to measure text width
+    const width = textElement.getBBox().width;
+
+    // Clean up the created elements
+    document.body.removeChild(svg);
+
+    // return
+    return width;
+}
+
 /**
  * Generates an SVG legend for a chart without specifying width and height.
  * It dynamically adjusts to fit all labels while maintaining a balanced layout.
@@ -7,7 +29,7 @@
  * @param {number} [padding=10] - The padding between legend items.
  * @returns {SVGElement} An SVG element containing the legend.
  */
-function __generate_legend(labels, colors, item_size = 20, padding = 10) {
+function __generate_legend(labels, colors, item_size = 20) {
     const golden_ratio = 1.618;
     const item_count = labels.length;
 
@@ -15,9 +37,10 @@ function __generate_legend(labels, colors, item_size = 20, padding = 10) {
     const cols = Math.ceil(Math.sqrt(item_count * golden_ratio));
     const rows = Math.ceil(item_count / cols);
 
-    const longest_label_length = Math.max(...labels.map(s => s.length));
-    const cell_width = item_size + item_size * longest_label_length * 0.500 + item_size * 0.250; // Enough space for the label text
-    const cell_height = item_size + padding;
+    const longest_label_width = Math.max(...labels.map(s => __get_text_width(s, item_size, 'Arial')));
+    const single_space_width = item_size * 0.250
+    const cell_width = item_size + single_space_width + longest_label_width + single_space_width; // Enough space for the label text
+    const cell_height = item_size + single_space_width;
 
     const width = cols * cell_width;
     const height = rows * cell_height;
@@ -30,8 +53,8 @@ function __generate_legend(labels, colors, item_size = 20, padding = 10) {
     labels.forEach((label, index) => {
         const col = index % cols;
         const row = Math.floor(index / cols);
-        const x = col * cell_width + padding;
-        const y = row * cell_height + padding;
+        const x = col * cell_width;
+        const y = row * cell_height;
 
         const group = document.createElementNS(svgNS, "g");
 

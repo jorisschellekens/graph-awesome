@@ -384,10 +384,14 @@ function __process_dom() {
         // Generate the appropriate chart SVG
         let new_element;
         if (chartType === "bubble") {
+            ys = ys.map(num => parseFloat(num)).filter(n => !isNaN(n));
             new_element = __bubble_chart(xs, ys, zs, width, height, width / 10);
+            has_legend = false;
         } else if (chartType === "donut") {
             new_element = __donut_chart(xs, ys, (width - 2 * (width / 10)) / 2, (width - 2 * (width / 10)) / 4, width / 10);
         } else if (chartType === "line") {
+            has_legend = false;
+            ys = ys.map(num => parseFloat(num)).filter(n => !isNaN(n));
             new_element = __line_chart(xs, ys, width, height, width / 10);
         } else if (chartType === "pie") {
             new_element = __pie_chart(xs, ys, (width - 2 * (width / 10)) / 2, width / 10);
@@ -398,7 +402,7 @@ function __process_dom() {
         // Replace element with the generated SVG
         el.replaceWith(new_element);
 
-        // legend
+        // Add legend if needed (and possible)
         if (has_legend) {
             new_element.parentNode.insertBefore(__generate_legend(xs, __generate_HSV_colors(xs.length), width / 10, width / 20), new_element.nextSibling);
         }

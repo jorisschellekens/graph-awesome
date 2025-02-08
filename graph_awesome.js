@@ -486,7 +486,7 @@ function __process_dom() {
 
 		// Generate the appropriate chart SVG
 		let new_element;
-		if (chartType === "bubble") {
+		if (chartType === "box") {
 			new_element = __box_chart(xs, width, height, width / 10);
 			has_legend = false;
 		} else if (chartType === "bubble") {

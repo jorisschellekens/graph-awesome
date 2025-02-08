@@ -1,4 +1,4 @@
-# ![graph awesome logo](https://github.com/jorisschellekens/graph-awesome/raw/master/img/graph_awesome_logo.webp) Graph Awesome
+# ![graph awesome logo](img/graph_awesome_logo_64.png) Graph Awesome
 
 This library provides functions to generate various types of SVG charts dynamically based on data provided through HTML class names.
 
@@ -24,6 +24,7 @@ This library provides functions to generate various types of SVG charts dynamica
 The library supports the following chart types:
 
 - **Bar Chart** (`ga-bar`)
+- **Box Chart** (`ga-box`)
 - **Bubble Chart** (`ga-bubble`)
 - **Donut Chart** (`ga-donut`)
 - **Line Chart** (`ga-line`)
@@ -52,6 +53,7 @@ Each chart type supports specific parameters that are set using class names.
 | Chart Type   | Required Parameters             | Optional Parameters      |
 |--------------|---------------------------------|--------------------------|
 | Bar Chart    | `ga-xs-*`, `ga-ys-*`            | `ga-<size>`, `ga-legend` |
+| Box Chart    | `ga-xs-*`                       |                          |
 | Bubble Chart | `ga-xs-*`, `ga-ys-*`, `ga-zs-*` | `ga-<size>`              |
 | Donut Chart  | `ga-xs-*`, `ga-ys-*`            | `ga-<size>`, `ga-legend` |
 | Line Chart   | `ga-xs-*`, `ga-ys-*`            | `ga-<size>`              |

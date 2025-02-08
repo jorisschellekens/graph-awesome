@@ -1,34 +1,34 @@
 /**
  * Calculates the width of a given text string when rendered with a specified font size.
- * 
+ *
  * This function creates an SVG text element to measure the width of the text accurately.
  * It temporarily appends the element to the document, retrieves its bounding box width,
  * and then removes it to avoid cluttering the DOM.
- * 
+ *
  * @param {string} text - The text whose width is to be measured.
  * @param {number|string} font_size - The font size to be used for measuring the text.
  * @returns {number} - The calculated width of the text in pixels.
  */
 function __get_text_width(text, font_size) {
-    // Create an SVG element in memory
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.style.visibility = "hidden";
-    document.body.appendChild(svg);
+	// Create an SVG element in memory
+	const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+	svg.style.visibility = "hidden";
+	document.body.appendChild(svg);
 
-    // Create a text element inside the SVG
-    const textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    textElement.setAttribute("font-size", font_size);
-    textElement.textContent = text;
-    svg.appendChild(textElement);
+	// Create a text element inside the SVG
+	const textElement = document.createElementNS("http://www.w3.org/2000/svg", "text");
+	textElement.setAttribute("font-size", font_size);
+	textElement.textContent = text;
+	svg.appendChild(textElement);
 
-    // Use getBBox to measure text width
-    const width = textElement.getBBox().width;
+	// Use getBBox to measure text width
+	const width = textElement.getBBox().width;
 
-    // Clean up the created elements
-    document.body.removeChild(svg);
+	// Clean up the created elements
+	document.body.removeChild(svg);
 
-    // return
-    return width;
+	// return
+	return width;
 }
 
 /**
@@ -41,56 +41,56 @@ function __get_text_width(text, font_size) {
  * @returns {SVGElement} An SVG element containing the legend.
  */
 function __generate_legend(labels, colors, item_size = 20) {
-    const golden_ratio = 1.618;
-    const item_count = labels.length;
+	const golden_ratio = 1.618;
+	const item_count = labels.length;
 
-    // Calculate optimal columns and rows using the golden ratio
-    const cols = Math.ceil(Math.sqrt(item_count * golden_ratio));
-    const rows = Math.ceil(item_count / cols);
+	// Calculate optimal columns and rows using the golden ratio
+	const cols = Math.ceil(Math.sqrt(item_count * golden_ratio));
+	const rows = Math.ceil(item_count / cols);
 
-    const longest_label_width = Math.max(...labels.map(s => __get_text_width(s, item_size, 'Arial')));
-    const single_space_width = item_size * 0.250
-    const cell_width = item_size + single_space_width + longest_label_width + single_space_width; // Enough space for the label text
-    const cell_height = item_size + single_space_width;
+	const longest_label_width = Math.max(...labels.map(s => __get_text_width(s, item_size, 'Arial')));
+	const single_space_width = item_size * 0.250
+	const cell_width = item_size + single_space_width + longest_label_width + single_space_width; // Enough space for the label text
+	const cell_height = item_size + single_space_width;
 
-    const width = Math.ceil(cols * cell_width);
-    const height = Math.ceil(rows * cell_height);
+	const width = Math.ceil(cols * cell_width);
+	const height = Math.ceil(rows * cell_height);
 
-    const svgNS = "http://www.w3.org/2000/svg";
-    const legend = document.createElementNS(svgNS, "svg");
-    legend.setAttribute("width", width);
-    legend.setAttribute("height", height);
+	const svgNS = "http://www.w3.org/2000/svg";
+	const legend = document.createElementNS(svgNS, "svg");
+	legend.setAttribute("width", width);
+	legend.setAttribute("height", height);
 
-    labels.forEach((label, index) => {
-        const col = index % cols;
-        const row = Math.floor(index / cols);
-        const x = col * cell_width;
-        const y = row * cell_height;
+	labels.forEach((label, index) => {
+		const col = index % cols;
+		const row = Math.floor(index / cols);
+		const x = col * cell_width;
+		const y = row * cell_height;
 
-        const group = document.createElementNS(svgNS, "g");
+		const group = document.createElementNS(svgNS, "g");
 
-        const rect = document.createElementNS(svgNS, "rect");
-        rect.setAttribute("x", x);
-        rect.setAttribute("y", y);
-        rect.setAttribute("rx", item_size / 20);
-        rect.setAttribute("ry", item_size / 20);
-        rect.setAttribute("width", item_size);
-        rect.setAttribute("height", item_size);
-        rect.setAttribute("fill", colors[index % colors.length]);
+		const rect = document.createElementNS(svgNS, "rect");
+		rect.setAttribute("x", x);
+		rect.setAttribute("y", y);
+		rect.setAttribute("rx", item_size / 20);
+		rect.setAttribute("ry", item_size / 20);
+		rect.setAttribute("width", item_size);
+		rect.setAttribute("height", item_size);
+		rect.setAttribute("fill", colors[index % colors.length]);
 
-        const text = document.createElementNS(svgNS, "text");
-        text.setAttribute("x", x + item_size + item_size * 0.250); // add 1 space character's worth of padding
-        text.setAttribute("y", y + item_size); // text is placed on th bottom
-        text.setAttribute("font-size", item_size);
-        text.setAttribute("fill", "#000");
-        text.textContent = label;
+		const text = document.createElementNS(svgNS, "text");
+		text.setAttribute("x", x + item_size + item_size * 0.250); // add 1 space character's worth of padding
+		text.setAttribute("y", y + item_size); // text is placed on th bottom
+		text.setAttribute("font-size", item_size);
+		text.setAttribute("fill", "#000");
+		text.textContent = label;
 
-        group.appendChild(rect);
-        group.appendChild(text);
-        legend.appendChild(group);
-    });
+		group.appendChild(rect);
+		group.appendChild(text);
+		legend.appendChild(group);
+	});
 
-    return legend;
+	return legend;
 }
 
 
@@ -101,20 +101,20 @@ function __generate_legend(labels, colors, item_size = 20) {
  * @returns {string[]} An array of `k` HSL color strings.
  */
 function __generate_HSV_colors(k) {
-    if (k === 3) {
-        return ["#f6511d", "#ffb400", "#00a6ed"];
-    } else if (k === 4) {
-        return ["#219ebc", "#023047", "#ffb703", "#fb8500"];
-    } else if (k == 5) {
-        return ['#55dde0', '#33658a', '#2f4858', '#f6ae2d', '#f26419'];
-    } else {
-        return Array.from({
-            length: k
-        }, (_, i) => {
-            const hue = (i * 360) / k;
-            return `hsl(${hue}, 100%, 50%)`;
-        });
-    }
+	if (k === 3) {
+		return ["#f6511d", "#ffb400", "#00a6ed"];
+	} else if (k === 4) {
+		return ["#219ebc", "#023047", "#ffb703", "#fb8500"];
+	} else if (k == 5) {
+		return ['#55dde0', '#33658a', '#2f4858', '#f6ae2d', '#f26419'];
+	} else {
+		return Array.from({
+			length: k
+		}, (_, i) => {
+			const hue = (i * 360) / k;
+			return `hsl(${hue}, 100%, 50%)`;
+		});
+	}
 }
 
 /**
@@ -126,97 +126,97 @@ function __generate_HSV_colors(k) {
  * @returns {SVGElement} An SVG element containing the bar chart.
  */
 function __bar_chart(xs, ys, width = 100, height = 100, margin = 10) {
-    const max_value = Math.max(...ys);
-    const bar_width = (width - 2 * margin) / ys.length;
-    const colors = __generate_HSV_colors(ys.length);
+	const max_value = Math.max(...ys);
+	const bar_width = (width - 2 * margin) / ys.length;
+	const colors = __generate_HSV_colors(ys.length);
 
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", width);
-    svg.setAttribute("height", height);
+	const svgNS = "http://www.w3.org/2000/svg";
+	const svg = document.createElementNS(svgNS, "svg");
+	svg.setAttribute("width", width);
+	svg.setAttribute("height", height);
 
-    ys.forEach((value, index) => {
-        const bar_height = (value / max_value) * (height - margin);
-        const rect = document.createElementNS(svgNS, "rect");
-        rect.setAttribute("x", index * bar_width + margin);
-        rect.setAttribute("y", height - bar_height);
-        rect.setAttribute("rx", bar_width / 20);
-        rect.setAttribute("ry", bar_width / 20);
-        rect.setAttribute("width", bar_width - 2);
-        rect.setAttribute("height", bar_height);
-        rect.setAttribute("fill", colors[index % colors.length]);
-        svg.appendChild(rect);
-    });
+	ys.forEach((value, index) => {
+		const bar_height = (value / max_value) * (height - margin);
+		const rect = document.createElementNS(svgNS, "rect");
+		rect.setAttribute("x", index * bar_width + margin);
+		rect.setAttribute("y", height - bar_height);
+		rect.setAttribute("rx", bar_width / 20);
+		rect.setAttribute("ry", bar_width / 20);
+		rect.setAttribute("width", bar_width - 2);
+		rect.setAttribute("height", bar_height);
+		rect.setAttribute("fill", colors[index % colors.length]);
+		svg.appendChild(rect);
+	});
 
-    return svg;
+	return svg;
 }
 
 /**
  * Generates an SVG box plot.
- * @param {Array<number>} data - The numerical dataset.
+ * @param {Array<number>} xs - The numerical dataset.
  * @param {number} width - The width of the SVG canvas.
  * @param {number} height - The height of the SVG canvas.
  * @returns {SVGElement} An SVG element containing the box plot.
  */
-function __box_plot(data, width, height, margin) {
-    if (data.length === 0) return null;
-    
-    data.sort((a, b) => a - b);
-    
-    const q1 = data[Math.floor(data.length * 0.25)];
-    const median = data[Math.floor(data.length * 0.5)];
-    const q3 = data[Math.floor(data.length * 0.75)];
-    const min = data[0];
-    const max = data[data.length - 1];
-    
-    const scale = d => margin + ((d - min) / (max - min)) * (width - 2 * margin);
-    
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", width);
-    svg.setAttribute("height", height);
-    
-    // Box (IQR)
-    const box = document.createElementNS(svgNS, "rect");
-    const h = (scale(q3) - scale(q1)) * 0.618;
-    box.setAttribute("x", scale(q1));
-    box.setAttribute("y", (height - h)/2);
-    box.setAttribute("width", scale(q3) - scale(q1));
-    box.setAttribute("height", h);
-    box.setAttribute("fill", "#ffb703");
-    box.setAttribute("stroke", "black");
-    
-    // Median Line
-    const medianLine = document.createElementNS(svgNS, "line");
-    medianLine.setAttribute("x1", scale(median));
-    medianLine.setAttribute("x2", scale(median));
-    medianLine.setAttribute("y1", (height - h)/2+h);
-    medianLine.setAttribute("y2", (height - h)/2);
-    medianLine.setAttribute("stroke", "black");
-    
-    // Whiskers
-    const whiskerMin = document.createElementNS(svgNS, "line");
-    whiskerMin.setAttribute("x1", scale(min));
-    whiskerMin.setAttribute("x2", scale(q1));
-    whiskerMin.setAttribute("y1", height / 2);
-    whiskerMin.setAttribute("y2", height / 2);
-    whiskerMin.setAttribute("stroke", "black");
-    
-    const whiskerMax = document.createElementNS(svgNS, "line");
-    whiskerMax.setAttribute("x1", scale(q3));
-    whiskerMax.setAttribute("x2", scale(max));
-    whiskerMax.setAttribute("y1", height / 2);
-    whiskerMax.setAttribute("y2", height / 2);
-    whiskerMax.setAttribute("stroke", "black");
-    
-    // Add elements to SVG
-    svg.appendChild(box);
-    svg.appendChild(medianLine);
-    svg.appendChild(whiskerMin);
-    svg.appendChild(whiskerMax);
-    
-    // Return
-    return svg;
+function __box_plot(xs, width, height, margin) {
+	if (xs.length === 0) return null;
+
+	xs.sort((a, b) => a - b);
+
+	const q1 = xs[Math.floor(xs.length * 0.25)];
+	const median = xs[Math.floor(xs.length * 0.5)];
+	const q3 = xs[Math.floor(xs.length * 0.75)];
+	const min = xs[0];
+	const max = xs[xs.length - 1];
+
+	const scale = d => margin + ((d - min) / (max - min)) * (width - 2 * margin);
+
+	const svgNS = "http://www.w3.org/2000/svg";
+	const svg = document.createElementNS(svgNS, "svg");
+	svg.setAttribute("width", width);
+	svg.setAttribute("height", height);
+
+	// Box (IQR)
+	const box = document.createElementNS(svgNS, "rect");
+	const h = (scale(q3) - scale(q1)) * 0.618;
+	box.setAttribute("x", scale(q1));
+	box.setAttribute("y", (height - h) / 2);
+	box.setAttribute("width", scale(q3) - scale(q1));
+	box.setAttribute("height", h);
+	box.setAttribute("fill", "#ffb703");
+	box.setAttribute("stroke", "black");
+
+	// Median Line
+	const medianLine = document.createElementNS(svgNS, "line");
+	medianLine.setAttribute("x1", scale(median));
+	medianLine.setAttribute("x2", scale(median));
+	medianLine.setAttribute("y1", (height - h) / 2 + h);
+	medianLine.setAttribute("y2", (height - h) / 2);
+	medianLine.setAttribute("stroke", "black");
+
+	// Whiskers
+	const whiskerMin = document.createElementNS(svgNS, "line");
+	whiskerMin.setAttribute("x1", scale(min));
+	whiskerMin.setAttribute("x2", scale(q1));
+	whiskerMin.setAttribute("y1", height / 2);
+	whiskerMin.setAttribute("y2", height / 2);
+	whiskerMin.setAttribute("stroke", "black");
+
+	const whiskerMax = document.createElementNS(svgNS, "line");
+	whiskerMax.setAttribute("x1", scale(q3));
+	whiskerMax.setAttribute("x2", scale(max));
+	whiskerMax.setAttribute("y1", height / 2);
+	whiskerMax.setAttribute("y2", height / 2);
+	whiskerMax.setAttribute("stroke", "black");
+
+	// Add elements to SVG
+	svg.appendChild(box);
+	svg.appendChild(medianLine);
+	svg.appendChild(whiskerMin);
+	svg.appendChild(whiskerMax);
+
+	// Return
+	return svg;
 }
 
 /**
@@ -229,34 +229,34 @@ function __box_plot(data, width, height, margin) {
  * @returns {SVGElement} An SVG element containing the bubble chart.
  */
 function __bubble_chart(xs, ys, zs, width = 400, height = 200, margin = 40) {
-    const max_size = Math.max(...zs);
-    const min_x = Math.min(...xs);
-    const max_x = Math.max(...xs);
-    const min_y = Math.min(...ys);
-    const max_y = Math.max(...ys);
-    const colors = __generate_HSV_colors(xs.length);
-    const svgNS = "http://www.w3.org/2000/svg";
+	const max_size = Math.max(...zs);
+	const min_x = Math.min(...xs);
+	const max_x = Math.max(...xs);
+	const min_y = Math.min(...ys);
+	const max_y = Math.max(...ys);
+	const colors = __generate_HSV_colors(xs.length);
+	const svgNS = "http://www.w3.org/2000/svg";
 
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", width);
-    svg.setAttribute("height", height);
-    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+	const svg = document.createElementNS(svgNS, "svg");
+	svg.setAttribute("width", width);
+	svg.setAttribute("height", height);
+	svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
-    xs.forEach((x_value, index) => {
-        const x = margin + ((x_value - min_x) / (max_x - min_x)) * (width - 2 * margin);
-        const y = height - margin - ((ys[index] - min_y) / (max_y - min_y)) * (height - 2 * margin);
-        const r = (zs[index] / max_size) * 5 + 1;
+	xs.forEach((x_value, index) => {
+		const x = margin + ((x_value - min_x) / (max_x - min_x)) * (width - 2 * margin);
+		const y = height - margin - ((ys[index] - min_y) / (max_y - min_y)) * (height - 2 * margin);
+		const r = (zs[index] / max_size) * 5 + 1;
 
-        const circle = document.createElementNS(svgNS, "circle");
-        circle.setAttribute("cx", x);
-        circle.setAttribute("cy", y);
-        circle.setAttribute("r", r);
-        circle.setAttribute("fill", colors[index % colors.length]);
-        circle.setAttribute("opacity", "0.6");
-        svg.appendChild(circle);
-    });
+		const circle = document.createElementNS(svgNS, "circle");
+		circle.setAttribute("cx", x);
+		circle.setAttribute("cy", y);
+		circle.setAttribute("r", r);
+		circle.setAttribute("fill", colors[index % colors.length]);
+		circle.setAttribute("opacity", "0.6");
+		svg.appendChild(circle);
+	});
 
-    return svg;
+	return svg;
 }
 
 /**
@@ -268,41 +268,41 @@ function __bubble_chart(xs, ys, zs, width = 400, height = 200, margin = 40) {
  * @returns {SVGElement} An SVG element containing the donut chart.
  */
 function __donut_chart(xs, ys, outer_radius = 40, inner_radius = 20, margin = 10) {
-    const total = ys.reduce((sum, value) => sum + value, 0);
-    let cumulative_angle = 0;
-    const center_x = outer_radius + margin;
-    const center_y = outer_radius + margin;
-    const colors = __generate_HSV_colors(ys.length);
+	const total = ys.reduce((sum, value) => sum + value, 0);
+	let cumulative_angle = 0;
+	const center_x = outer_radius + margin;
+	const center_y = outer_radius + margin;
+	const colors = __generate_HSV_colors(ys.length);
 
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", `${2 * (outer_radius + margin)}`);
-    svg.setAttribute("height", `${2 * (outer_radius + margin)}`);
+	const svgNS = "http://www.w3.org/2000/svg";
+	const svg = document.createElementNS(svgNS, "svg");
+	svg.setAttribute("width", `${2 * (outer_radius + margin)}`);
+	svg.setAttribute("height", `${2 * (outer_radius + margin)}`);
 
-    ys.forEach((value, index) => {
-        const angle = (value / total) * 2 * Math.PI;
-        const x1 = center_x + outer_radius * Math.cos(cumulative_angle);
-        const y1 = center_y + outer_radius * Math.sin(cumulative_angle);
-        const x1_inner = center_x + inner_radius * Math.cos(cumulative_angle);
-        const y1_inner = center_y + inner_radius * Math.sin(cumulative_angle);
+	ys.forEach((value, index) => {
+		const angle = (value / total) * 2 * Math.PI;
+		const x1 = center_x + outer_radius * Math.cos(cumulative_angle);
+		const y1 = center_y + outer_radius * Math.sin(cumulative_angle);
+		const x1_inner = center_x + inner_radius * Math.cos(cumulative_angle);
+		const y1_inner = center_y + inner_radius * Math.sin(cumulative_angle);
 
-        cumulative_angle += angle;
+		cumulative_angle += angle;
 
-        const x2 = center_x + outer_radius * Math.cos(cumulative_angle);
-        const y2 = center_y + outer_radius * Math.sin(cumulative_angle);
-        const x2_inner = center_x + inner_radius * Math.cos(cumulative_angle);
-        const y2_inner = center_y + inner_radius * Math.sin(cumulative_angle);
+		const x2 = center_x + outer_radius * Math.cos(cumulative_angle);
+		const y2 = center_y + outer_radius * Math.sin(cumulative_angle);
+		const x2_inner = center_x + inner_radius * Math.cos(cumulative_angle);
+		const y2_inner = center_y + inner_radius * Math.sin(cumulative_angle);
 
-        const large_arc_flag = angle > Math.PI ? 1 : 0;
-        const path = document.createElementNS(svgNS, "path");
-        const d = `M ${x1_inner} ${y1_inner} L ${x1} ${y1} A ${outer_radius} ${outer_radius} 0 ${large_arc_flag} 1 ${x2} ${y2} L ${x2_inner} ${y2_inner} A ${inner_radius} ${inner_radius} 0 ${large_arc_flag} 0 ${x1_inner} ${y1_inner} Z`;
+		const large_arc_flag = angle > Math.PI ? 1 : 0;
+		const path = document.createElementNS(svgNS, "path");
+		const d = `M ${x1_inner} ${y1_inner} L ${x1} ${y1} A ${outer_radius} ${outer_radius} 0 ${large_arc_flag} 1 ${x2} ${y2} L ${x2_inner} ${y2_inner} A ${inner_radius} ${inner_radius} 0 ${large_arc_flag} 0 ${x1_inner} ${y1_inner} Z`;
 
-        path.setAttribute("d", d);
-        path.setAttribute("fill", colors[index % colors.length]);
-        svg.appendChild(path);
-    });
+		path.setAttribute("d", d);
+		path.setAttribute("fill", colors[index % colors.length]);
+		svg.appendChild(path);
+	});
 
-    return svg;
+	return svg;
 }
 
 /**
@@ -314,45 +314,45 @@ function __donut_chart(xs, ys, outer_radius = 40, inner_radius = 20, margin = 10
  * @returns {SVGElement} An SVG element containing the line chart.
  */
 function __line_chart(xs, ys, width = 100, height = 100, margin = 10) {
-    const max_value = Math.max(...ys);
-    const min_value = Math.min(...ys);
-    const colors = __generate_HSV_colors(3);
-    const svgNS = "http://www.w3.org/2000/svg";
+	const max_value = Math.max(...ys);
+	const min_value = Math.min(...ys);
+	const colors = __generate_HSV_colors(3);
+	const svgNS = "http://www.w3.org/2000/svg";
 
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", width);
-    svg.setAttribute("height", height);
-    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+	const svg = document.createElementNS(svgNS, "svg");
+	svg.setAttribute("width", width);
+	svg.setAttribute("height", height);
+	svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
-    const x_step = (width - 2 * margin) / (xs.length - 1);
-    const y_scale = (height - 2 * margin) / (max_value - min_value);
+	const x_step = (width - 2 * margin) / (xs.length - 1);
+	const y_scale = (height - 2 * margin) / (max_value - min_value);
 
-    let path_d = "M";
-    ys.forEach((value, index) => {
-        const x = margin + index * x_step;
-        const y = height - margin - (value - min_value) * y_scale;
-        path_d += `${x},${y} `;
-    });
+	let path_d = "M";
+	ys.forEach((value, index) => {
+		const x = margin + index * x_step;
+		const y = height - margin - (value - min_value) * y_scale;
+		path_d += `${x},${y} `;
+	});
 
-    const path = document.createElementNS(svgNS, "path");
-    path.setAttribute("d", path_d.trim());
-    path.setAttribute("stroke", colors[0]);
-    path.setAttribute("stroke-width", "2");
-    path.setAttribute("fill", "none");
-    svg.appendChild(path);
+	const path = document.createElementNS(svgNS, "path");
+	path.setAttribute("d", path_d.trim());
+	path.setAttribute("stroke", colors[0]);
+	path.setAttribute("stroke-width", "2");
+	path.setAttribute("fill", "none");
+	svg.appendChild(path);
 
-    ys.forEach((value, index) => {
-        const x = margin + index * x_step;
-        const y = height - margin - (value - min_value) * y_scale;
-        const circle = document.createElementNS(svgNS, "circle");
-        circle.setAttribute("cx", x);
-        circle.setAttribute("cy", y);
-        circle.setAttribute("r", 4);
-        circle.setAttribute("fill", colors[1]);
-        svg.appendChild(circle);
-    });
+	ys.forEach((value, index) => {
+		const x = margin + index * x_step;
+		const y = height - margin - (value - min_value) * y_scale;
+		const circle = document.createElementNS(svgNS, "circle");
+		circle.setAttribute("cx", x);
+		circle.setAttribute("cy", y);
+		circle.setAttribute("r", 4);
+		circle.setAttribute("fill", colors[1]);
+		svg.appendChild(circle);
+	});
 
-    return svg;
+	return svg;
 }
 
 
@@ -363,35 +363,35 @@ function __line_chart(xs, ys, width = 100, height = 100, margin = 10) {
  * @returns {SVGElement} An SVG element containing the pie chart.
  */
 function __pie_chart(xs, ys, radius = 100, margin = 10) {
-    const total = ys.reduce((sum, value) => sum + value, 0);
-    let cumulative_angle = 0;
-    const center_x = radius + margin;
-    const center_y = radius + margin;
-    const colors = __generate_HSV_colors(ys.length);
+	const total = ys.reduce((sum, value) => sum + value, 0);
+	let cumulative_angle = 0;
+	const center_x = radius + margin;
+	const center_y = radius + margin;
+	const colors = __generate_HSV_colors(ys.length);
 
-    const svgNS = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(svgNS, "svg");
-    svg.setAttribute("width", `${2 * (radius + margin)}`);
-    svg.setAttribute("height", `${2 * (radius + margin)}`);
+	const svgNS = "http://www.w3.org/2000/svg";
+	const svg = document.createElementNS(svgNS, "svg");
+	svg.setAttribute("width", `${2 * (radius + margin)}`);
+	svg.setAttribute("height", `${2 * (radius + margin)}`);
 
-    ys.forEach((value, index) => {
-        const angle = (value / total) * 2 * Math.PI;
-        const x1 = center_x + radius * Math.cos(cumulative_angle);
-        const y1 = center_y + radius * Math.sin(cumulative_angle);
-        cumulative_angle += angle;
-        const x2 = center_x + radius * Math.cos(cumulative_angle);
-        const y2 = center_y + radius * Math.sin(cumulative_angle);
+	ys.forEach((value, index) => {
+		const angle = (value / total) * 2 * Math.PI;
+		const x1 = center_x + radius * Math.cos(cumulative_angle);
+		const y1 = center_y + radius * Math.sin(cumulative_angle);
+		cumulative_angle += angle;
+		const x2 = center_x + radius * Math.cos(cumulative_angle);
+		const y2 = center_y + radius * Math.sin(cumulative_angle);
 
-        const large_arc_flag = angle > Math.PI ? 1 : 0;
-        const path = document.createElementNS(svgNS, "path");
-        const d = `M ${center_x} ${center_y} L ${x1} ${y1} A ${radius} ${radius} 0 ${large_arc_flag} 1 ${x2} ${y2} Z`;
+		const large_arc_flag = angle > Math.PI ? 1 : 0;
+		const path = document.createElementNS(svgNS, "path");
+		const d = `M ${center_x} ${center_y} L ${x1} ${y1} A ${radius} ${radius} 0 ${large_arc_flag} 1 ${x2} ${y2} Z`;
 
-        path.setAttribute("d", d);
-        path.setAttribute("fill", colors[index % colors.length]);
-        svg.appendChild(path);
-    });
+		path.setAttribute("d", d);
+		path.setAttribute("fill", colors[index % colors.length]);
+		svg.appendChild(path);
+	});
 
-    return svg;
+	return svg;
 }
 
 /**
@@ -417,109 +417,109 @@ function __pie_chart(xs, ys, radius = 100, margin = 10) {
  * update charts when elements are added or modified.
  */
 function __process_dom() {
-    // Select elements that specify they should be bar, pie, or donut charts
-    document.querySelectorAll(".ga-bar, .ga-box, .ga-bubble, .ga-donut, .ga-line, .ga-pie").forEach(el => {
-        const classList = el.className.split(" ");
-        let width = 256,
-            height = 256;
-        let xs = [],
-            ys = [],
-            zs = [];
-        let chartType = "bar"; // Default to bar chart
-        let has_legend = false;
+	// Select elements that specify they should be bar, pie, or donut charts
+	document.querySelectorAll(".ga-bar, .ga-box, .ga-bubble, .ga-donut, .ga-line, .ga-pie").forEach(el => {
+		const classList = el.className.split(" ");
+		let width = 256,
+			height = 256;
+		let xs = [],
+			ys = [],
+			zs = [];
+		let chartType = "bar"; // Default to bar chart
+		let has_legend = false;
 
-        classList.forEach(cls => {
-            // Extract xs values from ga-xs-<num>-<num>-<num>...
-            if (cls.startsWith("ga-xs-")) {
-                xs = cls.split("-").slice(2);
-            }
+		classList.forEach(cls => {
+			// Extract xs values from ga-xs-<num>-<num>-<num>...
+			if (cls.startsWith("ga-xs-")) {
+				xs = cls.split("-").slice(2);
+			}
 
-            // Extract ys values from ga-ys-<num>-<num>-<num>...
-            if (cls.startsWith("ga-ys-")) {
-                ys = cls.split("-").slice(2).map(num => parseFloat(num)).filter(n => !isNaN(n));
-            }
+			// Extract ys values from ga-ys-<num>-<num>-<num>...
+			if (cls.startsWith("ga-ys-")) {
+				ys = cls.split("-").slice(2).map(num => parseFloat(num)).filter(n => !isNaN(n));
+			}
 
-            // Extract ys values from ga-zs-<num>-<num>-<num>...
-            if (cls.startsWith("ga-zs-")) {
-                zs = cls.split("-").slice(2).map(num => parseFloat(num)).filter(n => !isNaN(n));
-            }
+			// Extract ys values from ga-zs-<num>-<num>-<num>...
+			if (cls.startsWith("ga-zs-")) {
+				zs = cls.split("-").slice(2).map(num => parseFloat(num)).filter(n => !isNaN(n));
+			}
 
-            // Extract xs values from ga-xs-<num>-<num>-<num>...
-            if (cls.startsWith("ga-legend")) {
-                has_legend = true;
-            }
+			// Extract xs values from ga-xs-<num>-<num>-<num>...
+			if (cls.startsWith("ga-legend")) {
+				has_legend = true;
+			}
 
-            // Detect chart type
-            if (cls === "ga-bar") chartType = "bar";
-            if (cls === "ga-box") chartType = "box";            
-            if (cls === "ga-bubble") chartType = "bubble";
-            if (cls === "ga-donut") chartType = "donut";
-            if (cls === "ga-line") chartType = "line";
-            if (cls === "ga-pie") chartType = "pie";
+			// Detect chart type
+			if (cls === "ga-bar") chartType = "bar";
+			if (cls === "ga-box") chartType = "box";
+			if (cls === "ga-bubble") chartType = "bubble";
+			if (cls === "ga-donut") chartType = "donut";
+			if (cls === "ga-line") chartType = "line";
+			if (cls === "ga-pie") chartType = "pie";
 
-            // Size settings
-            if (cls === "ga-2xs") {
-                width = 32;
-                height = 32;
-            }
-            if (cls === "ga-xs") {
-                width = 64;
-                height = 64;
-            }
-            if (cls === "ga-s") {
-                width = 128;
-                height = 128;
-            }
-            if (cls === "ga-l") {
-                width = 512;
-                height = 512;
-            }
-            if (cls === "ga-xl") {
-                width = 1024;
-                height = 1024;
-            }
-            if (cls === "ga-2xl") {
-                width = 2048;
-                height = 2048;
-            }
-        });
+			// Size settings
+			if (cls === "ga-2xs") {
+				width = 32;
+				height = 32;
+			}
+			if (cls === "ga-xs") {
+				width = 64;
+				height = 64;
+			}
+			if (cls === "ga-s") {
+				width = 128;
+				height = 128;
+			}
+			if (cls === "ga-l") {
+				width = 512;
+				height = 512;
+			}
+			if (cls === "ga-xl") {
+				width = 1024;
+				height = 1024;
+			}
+			if (cls === "ga-2xl") {
+				width = 2048;
+				height = 2048;
+			}
+		});
 
-        // Generate the appropriate chart SVG
-        let new_element;
-        if (chartType === "bubble") {
-            new_element = __box_chart(xs, width, height, width / 10);
-            has_legend = false;
-        } else if (chartType === "bubble") {
-            ys = ys.map(num => parseFloat(num)).filter(n => !isNaN(n));
-            new_element = __bubble_chart(xs, ys, zs, width, height, width / 10);
-            has_legend = false;
-        } else if (chartType === "donut") {
-            new_element = __donut_chart(xs, ys, (width - 2 * (width / 10)) / 2, (width - 2 * (width / 10)) / 4, width / 10);
-        } else if (chartType === "line") {
-            has_legend = false;
-            ys = ys.map(num => parseFloat(num)).filter(n => !isNaN(n));
-            new_element = __line_chart(xs, ys, width, height, width / 10);
-        } else if (chartType === "pie") {
-            new_element = __pie_chart(xs, ys, (width - 2 * (width / 10)) / 2, width / 10);
-        } else {
-            new_element = __bar_chart(xs, ys, width, height, width / 10);
-        }
+		// Generate the appropriate chart SVG
+		let new_element;
+		if (chartType === "bubble") {
+			new_element = __box_chart(xs, width, height, width / 10);
+			has_legend = false;
+		} else if (chartType === "bubble") {
+			ys = ys.map(num => parseFloat(num)).filter(n => !isNaN(n));
+			new_element = __bubble_chart(xs, ys, zs, width, height, width / 10);
+			has_legend = false;
+		} else if (chartType === "donut") {
+			new_element = __donut_chart(xs, ys, (width - 2 * (width / 10)) / 2, (width - 2 * (width / 10)) / 4, width / 10);
+		} else if (chartType === "line") {
+			has_legend = false;
+			ys = ys.map(num => parseFloat(num)).filter(n => !isNaN(n));
+			new_element = __line_chart(xs, ys, width, height, width / 10);
+		} else if (chartType === "pie") {
+			new_element = __pie_chart(xs, ys, (width - 2 * (width / 10)) / 2, width / 10);
+		} else {
+			new_element = __bar_chart(xs, ys, width, height, width / 10);
+		}
 
-        // Replace element with the generated SVG
-        el.replaceWith(new_element);
+		// Replace element with the generated SVG
+		el.replaceWith(new_element);
 
-        // Add legend if needed (and possible)
-        if (has_legend) {
-            new_element.parentNode.insertBefore(__generate_legend(xs, __generate_HSV_colors(xs.length), width / 10, width / 20), new_element.nextSibling);
-        }
+		// Add legend if needed (and possible)
+		if (has_legend) {
+			new_element.parentNode.insertBefore(__generate_legend(xs, __generate_HSV_colors(xs.length), width / 10, width / 20), new_element.nextSibling);
+		}
 
-    });
+	});
 }
 
 
 document.addEventListener("DOMContentLoaded", __process_dom);
 const observer = new MutationObserver(__process_dom);
 observer.observe(document.body, {
-    childList: true,
-    subtree: true
+	childList: true,
+	subtree: true
 });

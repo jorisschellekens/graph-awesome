@@ -158,7 +158,7 @@ function __bar_chart(xs, ys, width = 100, height = 100, margin = 10) {
  * @param {number} height - The height of the SVG canvas.
  * @returns {SVGElement} An SVG element containing the box plot.
  */
-function __box_plot(xs, width, height, margin) {
+function __box_chart(xs, width, height, margin) {
 	if (xs.length === 0) return null;
 
 	xs.sort((a, b) => a - b);

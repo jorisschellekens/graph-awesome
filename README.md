@@ -5,17 +5,32 @@ This library provides functions to generate various types of SVG charts dynamica
 ## Hello World
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html>
-  <head>
-  </head>
-  <body>
-    <!-- bar chart -->
-    <div class="ga-bar ga-xs-apple-banana-cherry-durian ga-ys-10-20-15-25 ga-s ga-legend"></div>
+    <head> </head>
+    <body>
+        <!-- bar chart -->
+        <barchart>
+            <xs>Jan, Feb, Mar, Apr, May</xs>
+            <ys>10, 25, 18, 32, 27</ys>
+        </barchart>
 
-    <!-- load graph-awesome.js -->
-    <script src="https://cdn.jsdelivr.net/gh/jorisschellekens/graph-awesome@main/graph_awesome.js"></script>
-  </body>
+        <!-- bubble chart -->
+        <bubblechart>
+            <xs>10, 20, 30, 40, 50</xs>
+            <ys>15, 35, 25, 45, 30</ys>
+            <zs>5, 15, 10, 25, 20</zs>
+        </bubblechart>
+
+        <!-- line chart -->
+        <linechart>
+            <xs>1, 2, 3, 4, 5</xs>
+            <ys>10, 25, 18, 32, 27</ys>
+        </linechart>
+
+        <!-- load graph-awesome.js -->
+        <script src="https://cdn.jsdelivr.net/gh/jorisschellekens/graph-awesome@main/graph_awesome.js"></script>
+    </body>
 </html>
 ```
 

@@ -262,7 +262,7 @@
 		const tasks = [
 			...Array.from(document.querySelectorAll("barchart")).map(element => renderBarChart(element)),
 			...Array.from(document.querySelectorAll("piechart")).map(element => renderPieChart(element)),
-			...Array.from(document.querySelectorAll("donutchart")).map(element => renderDonutChart(element))
+			...Array.from(document.querySelectorAll("donutchart")).map(element => renderDonutChart(element)),
 			...Array.from(document.querySelectorAll("linechart")).map(element => renderLineChart(element)),
 			...Array.from(document.querySelectorAll("bubblechart")).map(element => renderBubbleChart(element))
 		];
